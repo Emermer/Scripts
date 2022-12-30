@@ -1,7 +1,7 @@
 ﻿#! /bin/bash
 
 ### XRANDR SETTINGS ###
-xrandr --output HDMI-1 --primary --mode 1920x1080 --rate 144 --pos 0x0 --rotate normal --output DP-3 --mode 1680x1050 --pos 1920x30 --rotate normal &
+xrandr --output DP-2 --mode 1680x1050 --pos 1920x30 --rotate normal --output HDMI-1 --primary --mode 1920x1080 --rate 144 --pos 0x0 --rotate normal &
 
 ### PICOM ###
 killall picom &
@@ -28,14 +28,6 @@ sxhkd &
 flameshot &
 nm-applet &
 autotiling &
-
-### MAILSPRING ###
-if pgrep mailspring >/dev/null
-then
-    echo mailspring
-else
-    mailspring
-fi &
 
 ### REDSHIFT ###
 if pgrep redshift-gtk >/dev/null
