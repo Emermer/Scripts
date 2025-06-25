@@ -73,7 +73,7 @@ paru -S --noconfirm \
   lib32-gamemode \
   lib32-mesa \
   lib32-vulkan-radeon \
-  libreoffice-fresh \
+  libreoffice \
   librewolf-bin \
   lutris \
   lxappearance \
