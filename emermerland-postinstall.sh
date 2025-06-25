@@ -7,15 +7,18 @@ NC='\033[0m'
 
 USERNAME=$(logname)
 
+# System update
 echo -e "${GREEN}>> Updating system...${NC}"
 sudo pacman -Syu --noconfirm
 
+# Pacman visuals
 echo -e "${GREEN}>> Enabling colored output and ILoveCandy in pacman.conf...${NC}"
 sudo sed -i 's/^#Color/Color/' /etc/pacman.conf
 if ! grep -q '^ILoveCandy' /etc/pacman.conf; then
   sudo sed -i '/^\[options\]/a ILoveCandy' /etc/pacman.conf
 fi
 
+# Install paru
 echo -e "${GREEN}>> Installing paru...${NC}"
 sudo pacman -S --needed --noconfirm git base-devel
 cd /tmp
@@ -23,6 +26,7 @@ git clone https://aur.archlinux.org/paru.git
 cd paru
 makepkg -si --noconfirm
 
+# Install packages with paru
 echo -e "${GREEN}>> Installing packages with paru...${NC}"
 paru -S --noconfirm \
   adobe-source-code-pro-fonts \
@@ -55,6 +59,8 @@ paru -S --noconfirm \
   gnome-disk-utility \
   goverlay \
   gparted \
+  grim \
+  gtklock \
   gtklock-powerbar-module \
   guestfs-tools \
   heroic-games-launcher-bin \
@@ -71,6 +77,8 @@ paru -S --noconfirm \
   lutris \
   lxappearance \
   lxsession \
+  mesa \
+  mesa-utils \
   mugshot \
   musescore \
   musescore3-git \
@@ -92,7 +100,9 @@ paru -S --noconfirm \
   protontricks \
   qalculate-gtk \
   qt5ct \
+  qt5-wayland \
   qt6ct \
+  qt6-wayland \
   r2modman-bin \
   rnnoise \
   rofi-lbonn-wayland-git \
@@ -100,6 +110,7 @@ paru -S --noconfirm \
   sassc \
   sddm \
   simple-and-soft-cursor \
+  slurp \
   smartmontools \
   spotube-bin \
   steam \
@@ -126,6 +137,9 @@ paru -S --noconfirm \
   wlroots0.18 \
   xf86-video-amdgpu \
   xf86-video-ati \
+  xdg-desktop-portal \
+  xdg-desktop-portal-gtk \
+  xdg-desktop-portal-hyprland \
   xorg-xinit \
   xwaylandvideobridge \
   yt-dlp \
@@ -134,8 +148,11 @@ paru -S --noconfirm \
   zsh \
   zsh-autosuggestions \
   zsh-syntax-highlighting \
-  zsh-theme-powerlevel10k-git
+  zsh-theme-powerlevel10k-git \
+  lib32-mesa \
+  lib32-vulkan-radeon
 
+# Flatpak apps
 echo -e "${GREEN}>> Installing Flatpak apps...${NC}"
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install -y flathub \
@@ -148,37 +165,31 @@ flatpak install -y flathub \
   org.polymc.PolyMC \
   dev.sober.Sober
 
-echo -e "${GREEN}>> Cloning dotfiles and copying .config and home files...${NC}"
+# Dotfiles
 cd ~"$USERNAME"
 git clone https://github.com/Emermer/Mydotfiles.git
-
 cp -r Mydotfiles/.config ~"$USERNAME"/
 cp -r Mydotfiles/HOME/. ~"$USERNAME"/
-
 chown -R "$USERNAME":"$USERNAME" ~"$USERNAME"/.config
 chown -R "$USERNAME":"$USERNAME" ~"$USERNAME"/
-
 rm -rf Mydotfiles
 
-echo -e "${GREEN}>> Setting Zsh as the default shell for $USERNAME...${NC}"
+# Default shell
 sudo chsh -s /bin/zsh "$USERNAME"
 
-echo -e "${GREEN}>> Configuring NetworkManager to use iwd as backend...${NC}"
+# NetworkManager + iwd
 sudo mkdir -p /etc/NetworkManager/conf.d
 echo -e "[device]\nwifi.backend=iwd" | sudo tee /etc/NetworkManager/conf.d/wifi_backend.conf
 sudo systemctl enable --now iwd.service
 
-echo -e "${GREEN}>> Creating /etc/sddm.conf for autologin as $USERNAME...${NC}"
+# SDDM autologin
 echo -e "[Autologin]\nUser=$USERNAME\nSession=hyprland" | sudo tee /etc/sddm.conf
-
-echo -e "${GREEN}>> Enabling SDDM login manager...${NC}"
 sudo systemctl enable sddm
 
-echo -e "${GREEN}>> Removing GRUB and installing systemd-boot...${NC}"
+# Remove GRUB, install systemd-boot
 sudo pacman -Rns --noconfirm grub grub-tools grub-theme* || true
 sudo bootctl install
 
-echo -e "${GREEN}>> Creating systemd-boot loader configuration...${NC}"
 echo "timeout 0" | sudo tee /boot/loader/loader.conf
 
 ROOT_PARTUUID=$(blkid -s PARTUUID -o value /dev/$(findmnt / -o SOURCE -n))
@@ -191,7 +202,7 @@ initrd  /initramfs-linux.img
 options root=PARTUUID=$ROOT_PARTUUID rw loglevel=3
 EOF
 
-echo -e "${GREEN}>> Adding 'loglevel=3' to all .conf files in /boot/loader/entries...${NC}"
+# Ensure loglevel=3 is present in all loader entries
 for file in /boot/loader/entries/*.conf; do
   if ! grep -q 'loglevel=3' "$file"; then
     echo "loglevel=3" | sudo tee -a "$file"
