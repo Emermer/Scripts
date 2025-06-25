@@ -10,6 +10,12 @@ USERNAME=$(logname)
 echo -e "${GREEN}>> Updating system...${NC}"
 sudo pacman -Syu --noconfirm
 
+echo -e "${GREEN}>> Enabling colored output and ILoveCandy in pacman.conf...${NC}"
+sudo sed -i 's/^#Color/Color/' /etc/pacman.conf
+if ! grep -q '^ILoveCandy' /etc/pacman.conf; then
+  sudo sed -i '/^\[options\]/a ILoveCandy' /etc/pacman.conf
+fi
+
 echo -e "${GREEN}>> Installing paru...${NC}"
 sudo pacman -S --needed --noconfirm git base-devel
 cd /tmp
@@ -125,8 +131,10 @@ paru -S --noconfirm \
   yt-dlp \
   zip \
   zram-generator \
+  zsh \
   zsh-autosuggestions \
-  zsh-syntax-highlighting
+  zsh-syntax-highlighting \
+  zsh-theme-powerlevel10k-git
 
 echo -e "${GREEN}>> Installing Flatpak apps...${NC}"
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -140,12 +148,25 @@ flatpak install -y flathub \
   org.polymc.PolyMC \
   dev.sober.Sober
 
-echo -e "${GREEN}>> Cloning dotfiles and copying .config...${NC}"
+echo -e "${GREEN}>> Cloning dotfiles and copying .config and home files...${NC}"
 cd ~"$USERNAME"
 git clone https://github.com/Emermer/Mydotfiles.git
+
+# Copy .config folder
 cp -r Mydotfiles/.config ~"$USERNAME"/
+
+# Copy files from HOME folder to ~
+cp -r Mydotfiles/HOME/. ~"$USERNAME"/
+
+# Set correct ownership
 chown -R "$USERNAME":"$USERNAME" ~"$USERNAME"/.config
+chown -R "$USERNAME":"$USERNAME" ~"$USERNAME"/
+
+# Clean up
 rm -rf Mydotfiles
+
+echo -e "${GREEN}>> Setting Zsh as the default shell for $USERNAME...${NC}"
+sudo chsh -s /bin/zsh "$USERNAME"
 
 echo -e "${GREEN}>> Configuring NetworkManager to use iwd as backend...${NC}"
 sudo mkdir -p /etc/NetworkManager/conf.d
@@ -169,4 +190,3 @@ for file in /boot/loader/entries/*.conf; do
 done
 
 echo -e "${GREEN}>> Setup complete! Reboot or log out to apply all changes.${NC}"
-
