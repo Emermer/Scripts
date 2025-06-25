@@ -152,17 +152,12 @@ echo -e "${GREEN}>> Cloning dotfiles and copying .config and home files...${NC}"
 cd ~"$USERNAME"
 git clone https://github.com/Emermer/Mydotfiles.git
 
-# Copy .config folder
 cp -r Mydotfiles/.config ~"$USERNAME"/
-
-# Copy files from HOME folder to ~
 cp -r Mydotfiles/HOME/. ~"$USERNAME"/
 
-# Set correct ownership
 chown -R "$USERNAME":"$USERNAME" ~"$USERNAME"/.config
 chown -R "$USERNAME":"$USERNAME" ~"$USERNAME"/
 
-# Clean up
 rm -rf Mydotfiles
 
 echo -e "${GREEN}>> Setting Zsh as the default shell for $USERNAME...${NC}"
@@ -179,8 +174,22 @@ echo -e "[Autologin]\nUser=$USERNAME\nSession=hyprland" | sudo tee /etc/sddm.con
 echo -e "${GREEN}>> Enabling SDDM login manager...${NC}"
 sudo systemctl enable sddm
 
-echo -e "${GREEN}>> Setting timeout=0 in /boot/loader/loader.conf...${NC}"
+echo -e "${GREEN}>> Removing GRUB and installing systemd-boot...${NC}"
+sudo pacman -Rns --noconfirm grub grub-tools grub-theme* || true
+sudo bootctl install
+
+echo -e "${GREEN}>> Creating systemd-boot loader configuration...${NC}"
 echo "timeout 0" | sudo tee /boot/loader/loader.conf
+
+ROOT_PARTUUID=$(blkid -s PARTUUID -o value /dev/$(findmnt / -o SOURCE -n))
+
+cat <<EOF | sudo tee /boot/loader/entries/arch.conf
+title   Arch Linux
+linux   /vmlinuz-linux
+initrd  /amd-ucode.img
+initrd  /initramfs-linux.img
+options root=PARTUUID=$ROOT_PARTUUID rw loglevel=3
+EOF
 
 echo -e "${GREEN}>> Adding 'loglevel=3' to all .conf files in /boot/loader/entries...${NC}"
 for file in /boot/loader/entries/*.conf; do
@@ -189,4 +198,4 @@ for file in /boot/loader/entries/*.conf; do
   fi
 done
 
-echo -e "${GREEN}>> Setup complete! Reboot or log out to apply all changes.${NC}"
+echo -e "${GREEN}>> Setup complete! Reboot to start using your system.${NC}"
