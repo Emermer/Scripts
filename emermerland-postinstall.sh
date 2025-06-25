@@ -52,7 +52,6 @@ paru -S --noconfirm \
   gammastep \
   gamescope \
   gamemode \
-  lib32-gamemode \
   gcolor3 \
   gedit \
   gimp \
@@ -60,8 +59,6 @@ paru -S --noconfirm \
   goverlay \
   gparted \
   grim \
-  gtklock \
-  gtklock-powerbar-module \
   guestfs-tools \
   heroic-games-launcher-bin \
   htop \
@@ -73,6 +70,10 @@ paru -S --noconfirm \
   jq \
   kdeconnect \
   layer-shell-qt \
+  lib32-gamemode \
+  lib32-mesa \
+  lib32-vulkan-radeon \
+  libreoffice-fresh \
   librewolf-bin \
   lutris \
   lxappearance \
@@ -99,10 +100,10 @@ paru -S --noconfirm \
   piper \
   protontricks \
   qalculate-gtk \
-  qt5ct \
   qt5-wayland \
-  qt6ct \
+  qt5ct \
   qt6-wayland \
+  qt6ct \
   r2modman-bin \
   rnnoise \
   rofi-lbonn-wayland-git \
@@ -148,9 +149,7 @@ paru -S --noconfirm \
   zsh \
   zsh-autosuggestions \
   zsh-syntax-highlighting \
-  zsh-theme-powerlevel10k-git \
-  lib32-mesa \
-  lib32-vulkan-radeon
+  zsh-theme-powerlevel10k-git
 
 # Flatpak apps
 echo -e "${GREEN}>> Installing Flatpak apps...${NC}"
