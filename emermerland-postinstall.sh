@@ -41,6 +41,8 @@ paru -S --noconfirm \
   bluez-utils \
   bridge-utils \
   cmus \
+  corectrl \
+  cpupower \
   debtap \
   deluge \
   docker \
@@ -106,7 +108,7 @@ paru -S --noconfirm \
   qt6ct \
   r2modman-bin \
   rnnoise \
-  rofi-lbonn-wayland-git \
+  rofi-wayland \
   rpcs3-git \
   sassc \
   sddm \
@@ -130,6 +132,7 @@ paru -S --noconfirm \
   virt-manager \
   virt-viewer \
   vscodium-bin \
+  vulkan-radeon \
   waybar \
   webcord-bin \
   wireless_tools \
@@ -175,6 +178,11 @@ rm -rf Mydotfiles
 
 # Default shell
 sudo chsh -s /bin/zsh "$USERNAME"
+
+# Set CPU governor to performance mode
+echo -e "${GREEN}>> Setting CPU governor to performance mode...${NC}"
+sudo systemctl enable --now cpupower
+echo "governor='performance'" | sudo tee /etc/default/cpupower
 
 # NetworkManager + iwd
 sudo mkdir -p /etc/NetworkManager/conf.d
