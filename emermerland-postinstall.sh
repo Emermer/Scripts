@@ -30,6 +30,7 @@ makepkg -si --noconfirm
 echo -e "${GREEN}>> Installing packages with paru...${NC}"
 paru -S --noconfirm \
   adobe-source-code-pro-fonts \
+  adw-gtk-theme \
   alacritty \
   alsa-utils \
   amd-ucode \
